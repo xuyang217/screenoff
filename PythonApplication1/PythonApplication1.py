@@ -22,6 +22,9 @@ t2=config.get('section_1','t2')
 t3=config.get('section_1','t3')
 t4=config.get('section_1','t4')
 color=config.get('section_1','color') #倒计时颜色
+off=config.get('section_1','screen')#锁屏倒计时
+
+
 now = time.strftime("%H:%M:%S",time.localtime())
 
 def loop1():
@@ -38,7 +41,7 @@ def loop2():
 def screenOff():
     global stop_threads,color
     stop_threads=False
-    span1=50
+    span1=int(off)
     while span1>0:
         now_1.set(span1)
         span1 = span1-1       
