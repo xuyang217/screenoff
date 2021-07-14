@@ -9,6 +9,7 @@ from ctypes import *
 import configparser
 import os
 
+
 #读取ini
 curpath = os.getcwd()
 #curpath = os.path.dirname(os.path.realpath(__file__))
@@ -20,20 +21,29 @@ t1=config.get('section_1','t1')
 t2=config.get('section_1','t2')
 t3=config.get('section_1','t3')
 t4=config.get('section_1','t4')
-
+color=config.get('section_1','color') #倒计时颜色
 now = time.strftime("%H:%M:%S",time.localtime())
+
 def loop1():
     pyautogui.press('scrolllock')
     pyautogui.press('scrolllock')
-    now1 = time.strftime("%H:%M:%S",time.localtime())
-    print(now1)
     span1=int(span)
-    time.sleep(span1)
+    while span1>0 and stop_threads:
+        now_1.set(span1)
+        span1 = span1-1       
+        time.sleep(1)
 def loop2():
     user32 = windll.LoadLibrary('user32.dll')
     user32.LockWorkStation()
 def screenOff():
-    time.sleep(3)
+    global stop_threads,color
+    stop_threads=False
+    span1=50
+    while span1>0:
+        now_1.set(span1)
+        span1 = span1-1       
+        time.sleep(1)
+    now_1.set("未运行") 
     HWND_BROADCAST = 0xffff
     WM_SYSCOMMAND = 0x0112
     SC_MONITORPOWER = 0xF170
@@ -44,27 +54,23 @@ def screenOff():
     shell32.ShellExecuteW(None, 'open', 'rundll32.exe','USER32', '', SW_SHOW)
 def LOOP():
     global stop_threads
-    while (t1<now<t2 or t3<now<t4):
+    while (t1<now<t2 or t3<now<t4) and stop_threads:
         loop1()
-        if stop_threads:
-            break
-    while t1<=now<t2:
+    if t1<=now<t2:
         loop2()
 def Button_2_onCommand():
     global stop_threads
-    str_obj.set("正在运行")
-    stop_threads=False
+    stop_threads=True
     run_thread = threading.Thread(target=LOOP)
     run_thread.setDaemon(True)
     run_thread.start()
 def Button_3_onCommand():
-    str_obj.set("未运行")
     global stop_threads
-    stop_threads=True
+    stop_threads=False
+    now_1.set("未运行")    
 def Button_5_onCommand():
     off_thread = threading.Thread(target=screenOff)
     off_thread.start()
-
 
 root = tkinter.Tk()
 root.title('锁屏小工具')
@@ -86,30 +92,29 @@ Button_3 = tkinter.Button(root, text="结束运行", font=('Arial', 12), width=1
 Button_5 = tkinter.Button(root, text="一键息屏", font=('Arial', 12), width=10, height=1,
                          command=Button_5_onCommand)
 
-    
-str_obj = tkinter.StringVar()
-str_obj.set("正在运行")
 
 span_in = tkinter.StringVar()
 span_in.set("间隔时间：" + span + "秒")
 
+now_1 = tkinter.StringVar()
 Label_4 = tkinter.Label(root,
-                 height = 1,
+                 height = 0,
                  width = 10,              
-                 font=("华文行楷", 20),
-                 textvariable = str_obj,
+                 font=("华文彩云", 30),
+                 fg=color,
+                 textvariable = now_1,
                  )
 
 
 #间隔时间赋值
 Label_1 = tkinter.Label(root,
-                 height = 1,
-                 width = 20,                
+                 height = 0,
+                 width = 15,                
                  font=("宋体", 12),
                  textvariable = span_in,
                  )
 
-Label_4.grid(column=1, row=0,padx=0,pady=20) #运行状态
+Label_4.grid(column=1, row=0,padx=0,pady=20) #倒计时
 Label_1.grid(column=1, row=1,padx=0,pady=20) #间隔时间
 
 Button_2.grid(column=1, row=2,padx=0,pady=20) #开始运行
