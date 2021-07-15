@@ -9,6 +9,10 @@ from ctypes import *
 import configparser
 import os
 
+#保证按钮重复按下不重复执行函数
+a1=0
+a2=0 
+a3=0
 
 #读取ini
 curpath = os.getcwd()
@@ -39,41 +43,62 @@ def loop2():
     user32 = windll.LoadLibrary('user32.dll')
     user32.LockWorkStation()
 def screenOff():
-    global stop_threads,color
+    global stop_threads,color,stop_off
     stop_threads=False
+    stop_off=True
+    Label_4.config(fg="red")
     span1=int(off)
-    while span1>0:
+    while span1>0 and stop_off:
         now_1.set(span1)
         span1 = span1-1       
         time.sleep(1)
-    now_1.set("未运行") 
-    HWND_BROADCAST = 0xffff
-    WM_SYSCOMMAND = 0x0112
-    SC_MONITORPOWER = 0xF170
-    MonitorPowerOff = 2
-    SW_SHOW = 5
-    windll.user32.PostMessageW(HWND_BROADCAST, WM_SYSCOMMAND,SC_MONITORPOWER, MonitorPowerOff)
-    shell32 = windll.LoadLibrary("shell32.dll")
-    shell32.ShellExecuteW(None, 'open', 'rundll32.exe','USER32', '', SW_SHOW)
+    if stop_off:
+        now_1.set("未运行")
+        HWND_BROADCAST = 0xffff
+        WM_SYSCOMMAND = 0x0112
+        SC_MONITORPOWER = 0xF170
+        MonitorPowerOff = 2
+        SW_SHOW = 5
+        windll.user32.PostMessageW(HWND_BROADCAST, WM_SYSCOMMAND,SC_MONITORPOWER, MonitorPowerOff)
+        shell32 = windll.LoadLibrary("shell32.dll")
+        shell32.ShellExecuteW(None, 'open', 'rundll32.exe','USER32', '', SW_SHOW)
+    
 def LOOP():
     global stop_threads
     while (t1<now<t2 or t3<now<t4) and stop_threads:
         loop1()
-    if t1<=now<t2:
-        loop2()
+    if t2<=now<t3:
+       loop2()
 def Button_2_onCommand():
-    global stop_threads
-    stop_threads=True
-    run_thread = threading.Thread(target=LOOP)
-    run_thread.setDaemon(True)
-    run_thread.start()
+    global stop_threads,stop_off,a1,a2,a3
+    a2=0
+    a3=0
+    if a1==0:
+        a1=1
+        Label_4.config(fg=color)
+        stop_threads=True
+        stop_off=False #终止息屏
+        run_thread = threading.Thread(target=LOOP)
+        run_thread.setDaemon(True)
+        run_thread.start()
 def Button_3_onCommand():
-    global stop_threads
-    stop_threads=False
-    now_1.set("未运行")    
+    global stop_threads,stop_off,a1,a2,a3
+    a1=0
+    a3=0
+    if a2==0:
+        a2=1
+        Label_4.config(fg=color)
+        stop_threads=False
+        stop_off=False
+        now_1.set("未运行")    
 def Button_5_onCommand():
-    off_thread = threading.Thread(target=screenOff)
-    off_thread.start()
+    global a1,a2,a3
+    a1=0
+    a2=0
+    if a3==0:
+        a3=1
+        off_thread = threading.Thread(target=screenOff)
+        off_thread.start()
 
 root = tkinter.Tk()
 root.title('锁屏小工具')
