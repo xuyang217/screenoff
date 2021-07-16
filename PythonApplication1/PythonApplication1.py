@@ -1,4 +1,5 @@
 #coding=utf-8
+#pyinstaller -F -w -i 1.ico PythonApplication1.py
 import tkinter
 import tkinter.filedialog
 from tkinter import *
