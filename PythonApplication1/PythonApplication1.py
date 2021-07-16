@@ -32,10 +32,12 @@ off=config.get('section_1','screen')#锁屏倒计时
 now = time.strftime("%H:%M:%S",time.localtime())
 
 def loop1():
+    global now
     pyautogui.press('scrolllock')
     pyautogui.press('scrolllock')
     span1=int(span)
-    while span1>0 and stop_threads:
+    while span1>0 and stop_threads and (t1<now<t2 or t3<now<t4):
+        now=time.strftime("%H:%M:%S",time.localtime())
         now_1.set(span1)
         span1 = span1-1       
         time.sleep(1)
@@ -64,11 +66,14 @@ def screenOff():
         shell32.ShellExecuteW(None, 'open', 'rundll32.exe','USER32', '', SW_SHOW)
     
 def LOOP():
-    global stop_threads
+    global stop_threads,now,a1
     while (t1<now<t2 or t3<now<t4) and stop_threads:
+        now=time.strftime("%H:%M:%S",time.localtime())
         loop1()
     if t2<=now<t3:
        loop2()
+       now_1.set("未运行")
+       a1=0
 def Button_2_onCommand():
     global stop_threads,stop_off,a1,a2,a3
     a2=0
@@ -101,7 +106,7 @@ def Button_5_onCommand():
         off_thread.start()
 
 root = tkinter.Tk()
-root.title('锁屏小工具')
+root.title('小助手')
 #窗口居中
 sw = root.winfo_screenwidth()
   #得到屏幕宽度
