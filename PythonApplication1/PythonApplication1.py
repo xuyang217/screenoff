@@ -68,6 +68,7 @@ def screenOff():
     
 def LOOP():
     global stop_threads,now,a1
+    now=time.strftime("%H:%M:%S",time.localtime())
     while (t1<now<t2 or t3<now<t4) and stop_threads:
         now=time.strftime("%H:%M:%S",time.localtime())
         loop1()
