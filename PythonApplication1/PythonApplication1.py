@@ -65,7 +65,7 @@ def screenOff():
         windll.user32.PostMessageW(HWND_BROADCAST, WM_SYSCOMMAND,SC_MONITORPOWER, MonitorPowerOff)
         shell32 = windll.LoadLibrary("shell32.dll")
         shell32.ShellExecuteW(None, 'open', 'rundll32.exe','USER32', '', SW_SHOW)
-    
+    root.destroy()
 def LOOP():
     global stop_threads,now,a1
     now=time.strftime("%H:%M:%S",time.localtime())
@@ -105,6 +105,7 @@ def Button_5_onCommand():
     if a3==0:
         a3=1
         off_thread = threading.Thread(target=screenOff)
+        off_thread.setDaemon(True)
         off_thread.start()
 
 root = tkinter.Tk()
